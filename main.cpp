@@ -126,7 +126,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			player.direction.x = 0;
 			player.direction.y = 0;
 			player.velocity.x = 5;
-			if (keys[DIK_W] && player.jumpFlag == false) {
+			if (keys[DIK_SPACE] && player.jumpFlag == false) {
 				player.direction.y += 1.0f;//ジャンプのための速度を追加
 				player.jumpFlag = true;
 
