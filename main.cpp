@@ -19,6 +19,10 @@ typedef struct Character {
 	int WayGh[10];
 
 };
+typedef struct Floatingflooar {
+	Vector2 pos; 
+	Vector2 size;
+};
 typedef struct Line {
 	Vector2  start;
 	Vector2 end;
@@ -29,6 +33,7 @@ typedef struct StageSprite {
 	Vector2 size;
 
 };
+
 //シーン
 enum sceanNum {
 	TITLE,
@@ -74,7 +79,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Character player;
 	Character playerScreen;
 	player.pos = { 200,100 };
-	player.velocity = { 10.10 };
+	player.velocity = { 10,10 };
 	player.length = 0.0f;
 	player.unitRadius = 1.0f;
 	player.jumpFlag = false;
@@ -83,9 +88,41 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Novice::LoadTexture("./Resources/player.png")
 	};
 
+	/*--------------床----------------------------*/
+
+	//LEFT
+	Floatingflooar floorLeft;
+	Floatingflooar floorLeftScreen;
+	floorLeft.pos = {100,200};
+	floorLeft.size = {250,10};
+
+	//LEFT
+	Floatingflooar floorRight;
+	Floatingflooar floorRightScreen;
+	floorRight.pos = { 930,200 };
+	floorRight.size = { 250,10 };
+
+	Floatingflooar floorCenter;
+	Floatingflooar floorCenterScreen;
+	floorCenter.pos = { 515,400 };
+	floorCenter.size = { 250,10 };
+
+
+
+
+
 	//スクリーン座標に変換
 	playerScreen.pos.y = player.pos.y - 670;
 	playerScreen.pos.y *= -1;
+
+	floorLeftScreen.pos.y = floorLeft.pos.y - 670;
+	floorLeftScreen.pos.y *= -1;
+
+	floorRightScreen.pos.y = floorRight.pos.y - 670;
+	floorRightScreen.pos.y *= -1;
+
+	floorCenterScreen.pos.y = floorCenter.pos.y - 670;
+	floorCenterScreen.pos.y *= -1;
 
 	StageSprite background;
 	background.pos = { -10,-10 };
@@ -100,6 +137,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	int sceanPhase = PLAYERPHASE;
 	int playerMode = PLAYERMOVE;
 	int bossMode = THUNDER;
+
+	
 
 
 
@@ -201,7 +240,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 				break;
 			}
-
+			
 
 			case PLAYERPHASE: {
 				break;
@@ -210,7 +249,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				break;
 			}
 		}
-
+			
+		
 
 		playerScreen.pos.y = player.pos.y - 670;
 		playerScreen.pos.y *= -1;
@@ -252,6 +292,25 @@ case BOSSPLAY: {
 	Novice::DrawBox(
 		floor.pos.x, floor.pos.y,
 		floor.size.x, floor.size.y,
+		0.0f,
+		BLACK,
+		kFillModeSolid);
+
+	Novice::DrawBox(
+		floorLeft.pos.x, floorLeftScreen.pos.y,
+		floorLeft.size.x, floorLeft.size.y,
+		0.0f,
+		BLACK,
+		kFillModeSolid);
+	Novice::DrawBox(
+		floorRight.pos.x, floorRightScreen.pos.y,
+		floorRight.size.x, floorRight.size.y,
+		0.0f,
+		BLACK,
+		kFillModeSolid);
+	Novice::DrawBox(
+		floorCenter.pos.x, floorCenterScreen.pos.y,
+		floorRight.size.x, floorRight.size.y,
 		0.0f,
 		BLACK,
 		kFillModeSolid);
