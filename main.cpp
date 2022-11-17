@@ -174,11 +174,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			player.direction.x = 0;
 			player.direction.y = 0;
 			player.velocity.x = 5;
+
 			player.accel.y = -0.5;
-			if (keys[DIK_W] && player.jumpFlag == false &&( player.pos.y == 100||
+				if (keys[DIK_SPACE] && player.jumpFlag == false &&( player.pos.y == 100||
 				(player.pos.y == floorLeft.pos.y + player.size.y&& player.pos.x + player.size.x >= floorLeft.pos.x && player.pos.x <= floorLeft.pos.x + floorLeft.size.x)||
 				(player.pos.y == floorRight.pos.y + player.size.y && player.pos.x + player.size.x >= floorRight.pos.x && player.pos.x <= floorRight.pos.x + floorRight.size.x)||
 				(player.pos.y == floorCenter.pos.y + player.size.y && player.pos.x + player.size.x >= floorCenter.pos.x && player.pos.x <= floorCenter.pos.x + floorCenter.size.x))) {
+
 				player.direction.y += 1.0f;//ジャンプのための速度を追加
 				player.jumpFlag = true;
 				player.velocity.y = 15;
