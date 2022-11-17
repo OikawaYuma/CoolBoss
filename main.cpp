@@ -12,6 +12,7 @@ typedef struct Character {
 	Vector2  velocity;//速さ
 	Vector2 direction;//方向
 	Vector2 accel;    //加速
+	Vector2 size;
 	int jumpFlag;   //ジャンプしているかどうか
 	float atackflag;  //攻撃しているかどうか
 	float length;
@@ -20,8 +21,10 @@ typedef struct Character {
 
 };
 typedef struct Floatingflooar {
-	Vector2 pos; 
+	Vector2 pos;
 	Vector2 size;
+	int rideFlag;
+	int fallFlag;
 };
 typedef struct Line {
 	Vector2  start;
@@ -78,8 +81,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	------------------------------------------------------------*/
 	Character player;
 	Character playerScreen;
-	player.pos = { 200,100 };
-	player.velocity = { 10,10 };
+	player.pos = { 0,100 };
+	player.size = { 50,100 };
+	player.velocity = { 10,0 };
 	player.length = 0.0f;
 	player.unitRadius = 1.0f;
 	player.jumpFlag = false;
@@ -93,20 +97,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//LEFT
 	Floatingflooar floorLeft;
 	Floatingflooar floorLeftScreen;
-	floorLeft.pos = {100,200};
-	floorLeft.size = {250,10};
+	floorLeft.pos = { 100,200 };
+	floorLeft.size = { 250,10 };
+	floorLeft.rideFlag = false;
+	floorLeft.fallFlag = false;
 
 	//LEFT
 	Floatingflooar floorRight;
 	Floatingflooar floorRightScreen;
 	floorRight.pos = { 930,200 };
 	floorRight.size = { 250,10 };
+	floorRight.rideFlag = false;
+	floorRight.fallFlag = false;
 
 	Floatingflooar floorCenter;
 	Floatingflooar floorCenterScreen;
 	floorCenter.pos = { 515,400 };
 	floorCenter.size = { 250,10 };
-
+	floorCenter.rideFlag = false;
+	floorCenter.fallFlag = false;
 
 
 
@@ -138,7 +147,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	int playerMode = PLAYERMOVE;
 	int bossMode = THUNDER;
 
-	
+
 
 
 
@@ -165,19 +174,85 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			player.direction.x = 0;
 			player.direction.y = 0;
 			player.velocity.x = 5;
-			if (keys[DIK_W] && player.jumpFlag == false) {
+			player.accel.y = -0.5;
+			if (keys[DIK_W] && player.jumpFlag == false &&( player.pos.y == 100||
+				(player.pos.y == floorLeft.pos.y + player.size.y&& player.pos.x + player.size.x >= floorLeft.pos.x && player.pos.x <= floorLeft.pos.x + floorLeft.size.x)||
+				(player.pos.y == floorRight.pos.y + player.size.y && player.pos.x + player.size.x >= floorRight.pos.x && player.pos.x <= floorRight.pos.x + floorRight.size.x)||
+				(player.pos.y == floorCenter.pos.y + player.size.y && player.pos.x + player.size.x >= floorCenter.pos.x && player.pos.x <= floorCenter.pos.x + floorCenter.size.x))) {
 				player.direction.y += 1.0f;//ジャンプのための速度を追加
 				player.jumpFlag = true;
+				player.velocity.y = 15;
 
 			}
-			if (player.jumpFlag == true && player.pos.y == 100) {
-				player.velocity.y = 10;
-				player.pos.y += player.direction.y * player.velocity.y;
+
+			player.velocity.y += player.accel.y;
+			player.pos.y += player.velocity.y;
+			
+			/*------------------------床との当たり判定----------------------*/
+			//左の床
+			if (player.pos.x + player.size.x >= floorLeft.pos.x && player.pos.x <= floorLeft.pos.x + floorLeft.size.x && player.pos.y - player.size.y >= floorLeft.pos.y) {
+				floorLeft.rideFlag = true;
+
 			}
-			if (player.jumpFlag == true) {
-				player.velocity.y += player.accel.y;
-				player.pos.y += player.velocity.y;
+			else if((player.pos.x + player.size.x < floorLeft.pos.x || player.pos.x > floorLeft.pos.x + floorLeft.size.x )&& player.pos.y - player.size.y <= floorLeft.pos.y) 
+			{ floorLeft.rideFlag = false; }
+			
+
+
+			if (floorLeft.rideFlag == true) {
+				if (player.pos.x + player.size.x >= floorLeft.pos.x && player.pos.x <= floorLeft.pos.x + floorLeft.size.x && player.pos.y - player.size.y <= floorLeft.pos.y ) {
+					player.pos.y  = floorLeft.pos.y + player.size.y;
+					player.velocity.y = 0;
+					player.jumpFlag = false;
+				}
+				
 			}
+			//右の床
+			if (player.pos.x + player.size.x >= floorRight.pos.x && player.pos.x <= floorRight.pos.x + floorRight.size.x && player.pos.y - player.size.y >= floorRight.pos.y) {
+				floorRight.rideFlag = true;
+
+			}
+			else if ((player.pos.x + player.size.x < floorRight.pos.x || player.pos.x > floorRight.pos.x + floorRight.size.x) && player.pos.y - player.size.y <= floorRight.pos.y)
+			{
+				floorRight.rideFlag = false;
+			}
+
+
+
+			if (floorRight.rideFlag == true) {
+				if (player.pos.x + player.size.x >= floorRight.pos.x && player.pos.x <= floorRight.pos.x + floorRight.size.x && player.pos.y - player.size.y <= floorRight.pos.y) {
+					player.pos.y = floorRight.pos.y + player.size.y;
+					player.velocity.y = 0;
+					player.jumpFlag = false;
+				}
+
+			}
+
+			//中心の床
+			if (player.pos.x + player.size.x >= floorCenter.pos.x && player.pos.x <= floorCenter.pos.x + floorCenter.size.x && player.pos.y - player.size.y >= floorCenter.pos.y) {
+				floorCenter.rideFlag = true;
+
+			}
+			else if ((player.pos.x + player.size.x < floorCenter.pos.x || player.pos.x > floorCenter.pos.x + floorCenter.size.x) && player.pos.y - player.size.y <= floorCenter.pos.y)
+			{
+				floorCenter.rideFlag = false;
+			}
+
+
+
+			if (floorCenter.rideFlag == true) {
+				if (player.pos.x + player.size.x >= floorCenter.pos.x && player.pos.x <= floorCenter.pos.x + floorCenter.size.x && player.pos.y - player.size.y <= floorCenter.pos.y) {
+					player.pos.y = floorCenter.pos.y + player.size.y;
+					player.velocity.y = 0;
+					player.jumpFlag = false;
+				}
+
+			}
+			
+			
+
+
+
 			if (player.pos.y <= 100) {
 				player.pos.y = 100;
 				player.jumpFlag = false;
@@ -185,6 +260,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			if (player.pos.y < 100) {
 				player.velocity.x = 0.0f;
 			}
+
+
 
 			if (keys[DIK_D]) {
 				player.direction.x += 1.0f;
@@ -206,18 +283,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				player.direction.x = player.direction.x / player.length;
 				player.direction.y = player.direction.y / player.length;
 			}
-
-
-
-
 			if (player.unitRadius != 0.0f) {
 				float length = sqrtf(player.direction.x * player.direction.x + player.direction.y * player.direction.y);
 				player.direction.x = player.direction.x / player.unitRadius;
 				player.direction.y = player.direction.y / player.unitRadius;
 			}
-			player.pos.x += player.direction.x * player.velocity.x;
-			player.pos.y += player.direction.y * player.velocity.x;
 
+			
+
+
+
+			player.pos.x += player.direction.x * player.velocity.x;
+			player.pos.y += player.direction.y * player.velocity.y;
+
+
+
+			playerScreen.pos.y = player.pos.y - 670;
+			playerScreen.pos.y *= -1;
 			switch (sceanPhase) {
 			case BOSSPHASE: {
 				switch (bossMode) {
@@ -240,7 +322,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 				break;
 			}
-			
+
 
 			case PLAYERPHASE: {
 				break;
@@ -248,104 +330,104 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			case LASTPHASE: {
 				break;
 			}
+			}
+
+
+			break;
 		}
-			
-		
-
-		playerScreen.pos.y = player.pos.y - 670;
-		playerScreen.pos.y *= -1;
-
-
-		break;
-	}
 		case GAMECLEAR: {
 			break;
 		}
 		case GAMEOVER: {
 			break;
 		}
-}
+		}
 
-///
-/// ↑更新処理ここまで
-///
+		///
+		/// ↑更新処理ここまで
+		///
 
-///
-/// ↓描画処理ここから
-///
-switch (sceanNum) {
-case TITLE: {
-	break;
-}
-case BOSSPLAY: {
+		///
+		/// ↓描画処理ここから
+		///
+		switch (sceanNum) {
+		case TITLE: {
+			break;
+		}
+		case BOSSPLAY: {
 
 
 
-	////背景
-	/*Novice::DrawBox(
-		background.pos.x, background.pos.y,
-		background.size.x, background.size.y,
-		0.0f,
-		0xFFFFFFFF,
-		kFillModeSolid);*/
-		//床
-	Novice::DrawBox(
-		floor.pos.x, floor.pos.y,
-		floor.size.x, floor.size.y,
-		0.0f,
-		BLACK,
-		kFillModeSolid);
+			////背景
+			/*Novice::DrawBox(
+				background.pos.x, background.pos.y,
+				background.size.x, background.size.y,
+				0.0f,
+				0xFFFFFFFF,
+				kFillModeSolid);*/
+				//床
+			Novice::DrawBox(
+				floor.pos.x, floor.pos.y,
+				floor.size.x, floor.size.y,
+				0.0f,
+				BLACK,
+				kFillModeSolid);
 
-	Novice::DrawBox(
-		floorLeft.pos.x, floorLeftScreen.pos.y,
-		floorLeft.size.x, floorLeft.size.y,
-		0.0f,
-		BLACK,
-		kFillModeSolid);
-	Novice::DrawBox(
-		floorRight.pos.x, floorRightScreen.pos.y,
-		floorRight.size.x, floorRight.size.y,
-		0.0f,
-		BLACK,
-		kFillModeSolid);
-	Novice::DrawBox(
-		floorCenter.pos.x, floorCenterScreen.pos.y,
-		floorRight.size.x, floorRight.size.y,
-		0.0f,
-		BLACK,
-		kFillModeSolid);
-	/*------------------------------------------------------
-					 自機の描画
-	-------------------------------------------------------*/
-	Novice::DrawSprite(
-		player.pos.x, playerScreen.pos.y,
-		player.WayGh[0],
-		1.0f, 1.0f,
-		0.0f,
-		0xFFFFFFFF);
+			Novice::DrawBox(
+				floorLeft.pos.x, floorLeftScreen.pos.y,
+				floorLeft.size.x, floorLeft.size.y,
+				0.0f,
+				BLACK,
+				kFillModeSolid);
+			Novice::DrawBox(
+				floorRight.pos.x, floorRightScreen.pos.y,
+				floorRight.size.x, floorRight.size.y,
+				0.0f,
+				BLACK,
+				kFillModeSolid);
+			Novice::DrawBox(
+				floorCenter.pos.x, floorCenterScreen.pos.y,
+				floorRight.size.x, floorRight.size.y,
+				0.0f,
+				BLACK,
+				kFillModeSolid);
+			/*------------------------------------------------------
+							 自機の描画
+			-------------------------------------------------------*/
+			Novice::DrawSprite(
+				player.pos.x, playerScreen.pos.y,
+				player.WayGh[0],
+				1.0f, 1.0f,
+				0.0f,
+				0xFFFFFFFF);
 
-	Novice::ScreenPrintf(10, 10, "player.pos.y:%f", player.pos.y);
-	Novice::ScreenPrintf(10, 40, "player.jumpFlag:%d", player.jumpFlag);
-	break;
-}
-case GAMECLEAR: {
-	break;
-case GAMEOVER: {
-	break;
-}
-}
-}
-///
-/// ↑描画処理ここまで
-///
+			Novice::ScreenPrintf(10, 10, "player.pos.y:%f", player.pos.y);
+			Novice::ScreenPrintf(300, 10, ":%f", player.size.y+floorLeft.pos.y);
+			Novice::ScreenPrintf(10, 40, "player.jumpFlag:%d", player.jumpFlag);
 
-// フレームの終了
-Novice::EndFrame();
+			Novice::ScreenPrintf(10, 70, "player.jumpFlag:%f", player.pos.x);
+			Novice::ScreenPrintf(10, 100, "player.jumpFlag:%f", floorLeft.pos.x);
+			Novice::ScreenPrintf(10, 120, "ride:%d", floorLeft.rideFlag);
+			break;
+		}
+		case GAMECLEAR: {
+			break;
+		case GAMEOVER: {
+			break;
+		}
+		}
+		}
+		///
+		/// ↑描画処理ここまで
+		///
 
-// ESCキーが押されたらループを抜ける
-if (preKeys[DIK_ESCAPE] == 0 && keys[DIK_ESCAPE] != 0) {
-	break;
-}
+		// フレームの終了
+		Novice::EndFrame();
+
+		// ESCキーが押されたらループを抜ける
+		if (preKeys[DIK_ESCAPE] == 0 && keys[DIK_ESCAPE] != 0) {
+			break;
+		}
 	}
 
 	// ライブラリの終了
