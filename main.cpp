@@ -379,8 +379,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//audio
 	int soundH1 = Novice::LoadAudio("./Resources/title.mp3");
 	int soundH2 = Novice::LoadAudio("./Resources/play.mp3");
+	int soundH3 = Novice::LoadAudio("./Resources/over.mp3");
+	int soundH4 = Novice::LoadAudio("./Resources/CLEAR.mp3");
 	int voice1 = -1;
 	int voice2 = -1;
+	int voice3 = -1;
+	int jump = Novice::LoadAudio("./Resources/jump.mp3");
+	int php = Novice::LoadTexture("./Resources/php.png");
+	int bhp = Novice::LoadTexture("./Resources/bhp.png");
+	int kame = Novice::LoadAudio("./Resources/kame.mp3");
+	int change = Novice::LoadAudio("./Resources/change.mp3");
 
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -407,6 +415,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			if (keys[DIK_SPACE] && preKeys[DIK_SPACE] == 0) {
 				sceanNum = BOSSPLAY;
+				if (!Novice::IsPlayingAudio(change)) {
+					Novice::PlayAudio(change, false, 1.0f);
+				}
 			}
 			break;
 		}
@@ -573,7 +584,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					player.direction.y += 1.0f;//ジャンプのための速度を追加
 					player.jumpFlag = true;
 					player.velocity.y = 17;
-
+					if (!Novice::IsPlayingAudio(jump)) {
+						Novice::PlayAudio(jump, false, 1.0f);
+					}
 				}
 
 
@@ -734,7 +747,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					}
 					if (atackFlag == true) {
 
-
 						if (gyarikku.pos.x < player.pos.x + player.size.x && player.pos.x < gyarikku.pos.x + gyarikku.size.x)
 						{
 							if ((gyarikku.pos.y > player.pos.y - player.size.y && player.pos.y < gyarikku.pos.y + gyarikku.size.y))
@@ -786,6 +798,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 						sceanPhase = BOSSPHASE;
 						boss.HP -= 34;
 						boss.pos.x = 800;
+						
 					}
 					if (atackFlag == true) {
 						boss.pos.x += 10;
@@ -806,7 +819,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				if (lastAtack >= 40) {
 					boss.pos.x += 10;
 				}
-				if (boss.pos.x >= 1600) {
+				if (boss.pos.x >= 2000) {
 					boss.pos.x = 800;
 					player.pos.x = 0;
 					player.pos.y = 100;
@@ -814,6 +827,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					playerDir = playerRight;
 					sceanNum = GAMECLEAR;
 					sceanPhase = BOSSPHASE;
+					bossMode = BOSSWAY;
+					playerMode = PLAYERMOVE;
 					lastAtack = 0;
 
 				}
@@ -834,6 +849,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		case GAMECLEAR: {
 			if (keys[DIK_SPACE] && preKeys[DIK_SPACE]) {
 				sceanNum = TITLE;
+				if (!Novice::IsPlayingAudio(change)) {
+					Novice::PlayAudio(change, false, 1.0f);
+				}
 			}
 			break;
 		}
@@ -841,12 +859,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			if (keys[DIK_SPACE] && preKeys[DIK_SPACE]) {
 				sceanNum = TITLE;
 				boss.pos.x = 800;
+				player.HP = 100;
+				boss.HP = 100;
 				player.pos.x = 0;
 				player.pos.y = 100;
 				bossAtackNum = 1;
 				playerDir = playerRight;
 				sceanPhase = BOSSPHASE;
+				bossMode = BOSSWAY;
+				playerMode = PLAYERMOVE;
 				lastAtack = 0;
+				if (!Novice::IsPlayingAudio(change)) {
+					Novice::PlayAudio(change, false, 1.0f);
+				}
 			}
 			break;
 		}
@@ -882,7 +907,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				1.0f, 1.0f,
 				0.0f,
 				0xFFFFFFFF);
-			Novice::StopAudio(voice2);
+			Novice::StopAudio(voice3);
 			if (Novice::IsPlayingAudio(voice1) == 0 || voice1 == -1) {
 				voice1 = Novice::PlayAudio(soundH1, true,0.5f);
 			}
@@ -1119,6 +1144,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 				}
 				//HPバー
+				Novice::DrawSprite(
+				playerHP.pos.x-10, playerHP.pos.y -10,
+					php,
+					1.0f, 1.0f,
+					0.0f,
+					0xFFFFFFFF);
+				Novice::DrawSprite(
+					bossHP.pos.x - 510, bossHP.pos.y - 10,
+					bhp,
+					1.0f, 1.0f,
+					0.0f,
+					0xFFFFFFFF);
 				Novice::DrawQuad(
 					playerHP.pos.x, playerHP.pos.y,
 					playerHP.pos.x + player.HP * 5, playerHP.pos.y,
@@ -1172,6 +1209,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 				}
 				//HPバー
+				Novice::DrawSprite(
+					playerHP.pos.x - 10, playerHP.pos.y - 10,
+					php,
+					1.0f, 1.0f,
+					0.0f,
+					0xFFFFFFFF);
+				Novice::DrawSprite(
+					bossHP.pos.x - 510, bossHP.pos.y - 10,
+					bhp,
+					1.0f, 1.0f,
+					0.0f,
+					0xFFFFFFFF);
 				Novice::DrawQuad(
 					playerHP.pos.x, playerHP.pos.y,
 					playerHP.pos.x + player.HP * 5, playerHP.pos.y,
@@ -1197,7 +1246,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 			case LASTPHASE: {
 				Novice::DrawSprite(
-					550, 100,
+					450, 100,
 					renda[rendaTimerW],
 					1.0f, 1.0f,
 					0.0f,
@@ -1263,15 +1312,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-			Novice::ScreenPrintf(10, 10, "bossMode:%d", bossMode);
+			/*Novice::ScreenPrintf(10, 10, "bossMode:%d", bossMode);
 			Novice::ScreenPrintf(10, 30, "bossModeT:%d", bossModeTimer);
 
 			Novice::ScreenPrintf(10, 50, "ban:%d", bossAtackNum);
-			Novice::ScreenPrintf(10, 70, "bant:%d", animanTimerWW);
+			Novice::ScreenPrintf(10, 70, "bant:%d", animanTimerWW);*/
 
 			break;
 		}
 		case GAMECLEAR: {
+			Novice::StopAudio(voice2);
+			if (Novice::IsPlayingAudio(voice3) == 0 || voice3 == -1) {
+				voice3 = Novice::PlayAudio(soundH4, true, 0.5f);
+			}
 			Novice::DrawSprite(
 				0, 0,
 				gameClear.gh,
@@ -1280,6 +1333,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				0xFFFFFFFF);
 			break;
 		case GAMEOVER: {
+			Novice::StopAudio(voice2);
+			if (Novice::IsPlayingAudio(voice3) == 0 || voice3 == -1) {
+				voice3 = Novice::PlayAudio(soundH3, true, 0.5f);
+			}
 			Novice::DrawSprite(
 				0, 0,
 				gameOver.gh,
