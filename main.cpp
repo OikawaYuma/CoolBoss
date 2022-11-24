@@ -459,10 +459,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 
-			//シェイク確認
-			if (keys[DIK_Q]) {
-				background.shake = rand() % 20 - 10;
-			}
+			////シェイク確認
+			//if (keys[DIK_Q]) {
+			//	background.shake = rand() % 20 - 10;
+			//}
 
 
 
@@ -585,7 +585,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					player.jumpFlag = true;
 					player.velocity.y = 17;
 					if (!Novice::IsPlayingAudio(jump)) {
-						Novice::PlayAudio(jump, false, 1.0f);
+						Novice::PlayAudio(jump, false, 2.0f);
 					}
 				}
 
@@ -824,6 +824,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					player.pos.x = 0;
 					player.pos.y = 100;
 					bossAtackNum = 1;
+					bossAtackNumTmp = 0;
 					playerDir = playerRight;
 					sceanNum = GAMECLEAR;
 					sceanPhase = BOSSPHASE;
@@ -856,14 +857,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		}
 		case GAMEOVER: {
-			if (keys[DIK_SPACE] && preKeys[DIK_SPACE]) {
+			if (keys[DIK_SPACE] && preKeys[DIK_SPACE]==0) {
 				sceanNum = TITLE;
+				atackFlag = false;
+				atackTimer = 0;
 				boss.pos.x = 800;
 				player.HP = 100;
 				boss.HP = 100;
 				player.pos.x = 0;
 				player.pos.y = 100;
 				bossAtackNum = 1;
+				bossAtackNumTmp = 0;
 				playerDir = playerRight;
 				sceanPhase = BOSSPHASE;
 				bossMode = BOSSWAY;
