@@ -610,13 +610,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					break;
 				}
 				case THUNDER: {//雷攻撃の処理 担当なち
-					if (keys[DIK_R]) {
+					/*if (keys[DIK_R]) {
 						bossMode = BOSSWAY;
 					}
 
 					if (keys[DIK_R]) {
 						bossMode = BOSSWAY;
-					}
+					}*/
 					atackTimer++;
 					if (atackTimer >= 150 && atackFlag == false) {
 						atackTimer = 0;
@@ -660,9 +660,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					break;
 				}
 				case DEATHBALL: {//デスボール攻撃の処理
-					if (keys[DIK_R]) {
+					/*if (keys[DIK_R]) {
 						bossMode = BOSSWAY;
-					}
+					}*/
 					if (atackTimer <= 100 && atackFlag == false) {
 						playerT.tmp.pos.x = player.pos.x;
 						playerT.tmp.pos.y = player.pos.y;
@@ -701,9 +701,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				}
 				case UPDOWNATACK: {//上下攻撃 担当だいき
 					int color = WHITE;
-					if (keys[DIK_R]) {
+					/*if (keys[DIK_R]) {
 						bossMode = BOSSWAY;
-					}
+					}*/
 					atackTimer++;
 					if (atackTimer >= 150 && atackFlag == false) {
 						atackTimer = 0;
@@ -731,9 +731,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 					break;
 				}
 				case GYARIKKUHOU: {
-					if (keys[DIK_R]) {
+					/*if (keys[DIK_R]) {
 						bossMode = BOSSWAY;
-					}
+					}*/
 					atackTimer++;
 					if (atackTimer >= 150 && atackFlag == false) {
 						atackTimer = 0;
@@ -767,9 +767,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 
 			case PLAYERPHASE: {
-				if (keys[DIK_T]) {
+				/*if (keys[DIK_T]) {
 					sceanPhase = BOSSPHASE;
-				}
+				}*/
 				switch (playerMode) {
 				case PLAYERMOVE: {
 					if (keys[DIK_SPACE] && preKeys[DIK_SPACE] == 0) {
